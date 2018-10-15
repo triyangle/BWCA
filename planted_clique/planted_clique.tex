@@ -1,0 +1,211 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{bwca-scribe}
+\begin{document}
+% \title{Blank}
+\lecture{3}{Planted Clique in Random Graph}{Jiazheng Zhao, William Yang}{Sep 24 2018}
+
+
+\section{Introduction}
+In this note, we are going to look at an algorithm that solves the planted
+clique problem. The method we are going to use involves some spectral graph
+theory. While this note may include many algebraic proofs, the main purpose is
+to let readers understand intuitively why this algorithm works. Note that this
+is an algorithm on a random instance, so the analysis is to show that the algorithm is effective with high probability. 
+
+\subsection{Problem}
+While this problem may have a more generalized form, we are going to discuss
+one particular variant of this problem:
+\begin{itemize}
+    \item let $G = (V, E)$ where $G \sim \mathcal{G}_{n, \frac{1}{2}}$ random graph
+    \item $S \subseteq V$ is a set of vertices selected uniformly at random, and $|S| = k$
+    \item Plant a clique on $S$, i.e. connect all edges among vertices in $S$
+\end{itemize}
+
+Here we propose an algorithm that can find a planted clique of size $k$ in a
+graph $G
+\sim \mathcal{G}_{n,\frac{1}{2}}$ with high probability when $k >> \sqrt{n}$.
+
+\subsection{Algorithm}
+Input: Graph $G$, with a planted clique of size $k$
+\begin{itemize}
+%   \item 
+  \item $M := A - \frac{1}{2}J$, where $A$ is the adjacency matrix of $G$, and
+      $J$ is a matrix of all $1$s
+  \item $\mathbf{x}$: eigenvector of the largest eigenvalue of $M$
+  \item $I$: set of $k$ vertices what have the largest values of $|\mathbf{x}_v|$ 
+  \item $C$: set of vertices $v \in V$ that have at least $\frac{3}{4}k$
+      neighbors in $I$
+  \item Return $C$
+\end{itemize}
+The algorithm can be divided into two parts: the first two lines obtain an
+eigenvector from the given instance; the following lines of algorithm can be
+seen as a way of rounding to extract the solution from the eigenvector. 
+
+\section{Analysis}
+Since the algorithm is divided into two parts, the analysis of this algorithm is divided accordingly: First, we focus on the first two lines of the algorithm and show that the eigenvector $x$ is very close to solution with high probability. Second, we argue that the way we recover the solution from the eigenvector (the last three lines of algorithm) guarantees a solution with high probability. 
+
+\subsection{Analysis of Retrieved Eigenvector}
+Recall that $S$ is the set of vertices on which the clique of size $k$ is planted.
+Let $\mathbf{1}_S$ be an indicator vector that is 1 at position $i$ if vertex
+$i$ is in the set $S$. If we can get $\mathbf{1}_S$, then the problem is
+solved, because that vector encodes the clique we want to find. We want to show
+that with high probability, the eigenvector $\mathbf{x}$ we get is close to
+$\mathbf{1}_S$, so that it makes sense to try to work on $\mathbf{x}$ to obtain the solution.
+
+First we want to show that the top eigenvalue of matrix $M$ and the top eigenvalue of $\mathbf{1}_S\mathbf{1}_S^T$, a rank one matrix that encodes the answer, are very close. 
+
+Let us look at $\EX(A)$: 
+$$\EX(A) = \frac{1}{2}J + \frac{1}{2}\mathbf{1}_S\mathbf{1}_S^T - D$$
+where  $J$ is a matrix with 1 everywhere. 
+
+\begin{itemize}
+    \item First ignore the clique we planted. Since $A$ is the adjacency matrix of $G
+        \sim \mathcal{G}_{n, \frac{1}{2}}$, each edge exists with probability $\frac{1}{2}$, so each entry of $A$ is 1 with probability 0.5 and 0 with probability 0.5. Therefore $\EX(A_{i,j}) = \frac{1}{2}$. We use a matrix where all entries are $\frac{1}{2}$ to represent that.
+
+    \item $S$ is the set of vertices that forms the clique. Because there must
+        exist an edge between all vertices in $S$, $A_{i,j} = 1$ where $i, j
+        \in S$. Note that the $(i, j)$th entry of $\mathbf{1}_S\mathbf{1}_S^T$ is exactly one if $i,j \in S$ 0 elsewhere. Therefore adding $\frac{1}{2}\mathbf{1}_S\mathbf{1}_S^T$ to the all $\frac{1}{2}$ will adjust the expected value of entries that represent edges in clique.
+
+    \item $D$ is a diagonal matrix with $D_{i,i} = 1$ if $i\in S$ and
+        $\frac{1}{2}$ elsewhere. This matrix is used to adjust the diagonal
+        entry of $\EX{(A)}$.
+\end{itemize}
+
+Intuitively, we assume our graph $A \approx \EX(A)$, and we ignore the diagnal
+term for now, we can see $M = A - \frac{1}{2}J \approx \frac{1}{2} \mathbf{1}_S
+\mathbf{1}_S^T$, which is a one rank one matrix with eigenvector
+$\mathbf{1}_S$, which is the solution we want. 
+
+In order to show the eigenvector of the two matrices are similar, we first want
+to show that $A$ and $\EX(A)$ are ``close" to each other. We can use the operator norm to measure the difference between the two matrices. In this case, since both matrices are symmetric, the operator norm is just the spectral norm. In other words, we are trying to show that the largest eigenvalue of the two matrices are close. 
+
+\begin{lemma}
+Fix a set S of size k. With high probability that the following is true:
+$$\|A-\EX(A)\| \leq (1+o(1))\cdot \sqrt{n}$$
+where $\|\cdot\|$ is the spectral norm.
+\end{lemma} 
+% \begin{proof}
+We omit the proof here to keep the note simple. 
+% \end{proof}
+We can apply this lemma and bound the ``closeness" of $M$ and $\frac{1}{2}\mathbf{1}_S\mathbf{1}_S^T$:
+
+$$\left\|M- \frac{1}{2}\mathbf{1}_S\mathbf{1}_S^T\right\| =
+\left\|A-\frac{1}{2}J - \frac{1}{2}\mathbf{1}_S\mathbf{1}_S^T\right\| \leq \|A-\EX(A)\|   + \|D\|\leq(1+o(1))\cdot \sqrt{n}$$
+
+That shows the top eigenvalue of the matrix $M$ we defined and the matrix $ \frac{1}{2}\mathbf{1}_S\mathbf{1}_S^T$ are very close.
+
+Now, given that the top eigenvalues are close, we would like to show that the eigenvectors of matrix M and $\mathbf{1}_S\mathbf{1}_S^T$ are very close. Essentially, we want to show
+$\min\{\|\mathbf{x}-\mathbf{1}_S\|^2, \|-\mathbf{x}-\mathbf{1}_S\|^2\}$ is small.
+\begin{theorem}[Davis and Kahan]
+If $M$ is a symmetric matrix, $yy^T$ is a rank-one symmetric matrix, and $\mathbf{x}$ is an eigenvector of the largest eigenvalue of $M$, we have
+
+% If we plug everything above into the inequality, we get:
+$$|\sin(\Hat{\mathbf{x} \mathbf{y}})| \leq \dfrac{\|M - \mathbf{y}\mathbf{y}^T\|}{\|\mathbf{y}\mathbf{y}^T\| - \|M - \mathbf{y}\mathbf{y}^T\|}$$
+where $\Hat{\mathbf{x}\mathbf{y}}$ is the angle between $\mathbf{x}, \mathbf{y}$.
+\end{theorem}
+
+
+
+\begin{corollary}
+If $\|A-\frac{1}{2}J - \frac{1}{2}\mathbf{1}_S\mathbf{1}_S^T\| \leq (1+o(1))\sqrt{n}, k>100\sqrt{n}$, and $\mathbf{x}$ is an eigenvector of the largest eigenvalue of $A-\frac{1}{2}J$ scaled so that $\|\mathbf{x}\|^2=k$, then
+$$\min\{\|\mathbf{x}-\mathbf{1}_S\|^2, \|-\mathbf{x}-\mathbf{1}_S\|^2\} \leq 0.002k$$
+for sufficiently large n.
+\end{corollary}
+
+\begin{proof}
+First we find the spectral norm of $\|\frac{1}{2}\mathbf{1}_S\mathbf{1}_S^T\|$.
+Notice that the spectral norm of this rank one matrix is just the maximized
+Rayleigh quotient of the matrix. Since the matrix is rank one and the only eigenvector is $\mathbf{1}_S$, we can get
+$$
+\left\|\frac{1}{2}\mathbf{1}_S\mathbf{1}_S^T\right\| = 
+\frac{1}{2}\|\mathbf{1}_S\mathbf{1}_S^T\| = 
+\dfrac{1}{2}\dfrac{\mathbf{1}_S^T\mathbf{1}_S\mathbf{1}_S^T\mathbf{1}_S}{\mathbf{1}_S^T\mathbf{1}_S} = \dfrac{1}{2}\mathbf{1}_S^T\mathbf{1}_S = \dfrac{k}{2}
+$$
+Then we apply the Davis-Kahan theorem and we see 
+$$|\sin(\Hat{\mathbf{x} \mathbf{1}_S})| \leq \dfrac{(1+o(1))\sqrt{n}}{\frac{k}{2} - (1 + o(1))\sqrt{n}} = \frac{1}{49} + o(1)$$
+
+Now we have to reason about the distance between $\mathbf{x}$ and $\mathbf{1}_S$:
+$$\|\mathbf{x} - \mathbf{1}_S\|^2 = \|\mathbf{x}\|^2 + \|\mathbf{1}_S\|^2 - 2 \langle \mathbf{x}, \mathbf{1}_S\rangle = 2k - 2 \langle \mathbf{x}, \mathbf{1}_S\rangle $$
+similarly
+$$\|- \mathbf{x} - \mathbf{1}_S\|^2 = 2k + 2 \langle \mathbf{x}, \mathbf{1}_S\rangle $$
+
+Therefore we have:
+$$\min\{\|\mathbf{x} - \mathbf{1}_S\|^2, \|- \mathbf{x} - \mathbf{1}_S\|^2\} = 2k - 2\cdot |\langle \mathbf{x}, \mathbf{1}_S\rangle|$$
+
+Combining the previous results, we have
+$$|\langle \mathbf{x}, \mathbf{1}_S\rangle| = \|\mathbf{x}\|\cdot\|\mathbf{1}_S\|\cdot \cos(\Hat{\mathbf{x}\mathbf{1}_S}) = k \cos(\Hat{\mathbf{x}\mathbf{1}_S}) = k\cdot \sqrt{1 - \sin^2({\Hat{\mathbf{x}\mathbf{1}_S}})} \geq k \sqrt{\dfrac{49^2 - 1}{49^2} - o(1)} > 0.999 \cdot k$$
+
+Therefore:
+$$\min\{\|\mathbf{x}-\mathbf{1}_S\|^2, \|-\mathbf{x}-\mathbf{1}_S\|^2\} \leq 2k - 2\cdot 0.999\cdot k = 0.002k$$
+\end{proof}
+
+We have finally shown that the eigenvector $\mathbf{x}$ is very close to the
+solution vector $\mathbf{1}_S$. But since $\mathbf{x}$ is a real valued vector,
+the solution to this problem is still not clear yet. The next step is to
+perform some deterministic rounding to retrieve the solution from the vector
+$\mathbf{x}$.
+
+\subsection{Recovery Step}
+We will now proceed to analyze the second half of the algorithm, involving $I$
+and $C$ and their relationship to $S$. In particular, to show the correctness
+of the algorithm, we must show that $C$ contains all the elements of $S$ ($S
+\subseteq C$) and none of the elements not in $S$ ($C \subseteq S$) with high
+probability. We begin by showing the first part, that $S \subseteq C$ with high probability.
+
+\subsubsection{$S \subseteq C$ with high probability}
+The first step towards showing this is that if $I$ is defined to be the set of
+$k$ vertices $v$ for which $|\mathbf{x}_{v}|$ is largest, then the sets $I$ and $S$ are almost
+the same. This results from the following lemma:
+\begin{lemma}
+    If $\mathbf{x}$ is a vector such that $\|\mathbf{x}\|^{2} = |S| = k$ and
+    $$\min\{\|\mathbf{x} - \mathbf{1}_{S}\|^{2}, \|-\mathbf{x} - \mathbf{1}_{S}\|^{2}\} \leq
+    \epsilon k$$
+    and if $I$ is the set of $k$ vertices $v$ with largest $|\mathbf{x}_{v}|$, then $I$
+    and $S$ have at least $k(1 - 4 \epsilon)$ vertices in common.
+\end{lemma}
+\begin{proof}
+    To prove this lemma, let's begin by defining \emph{bad} vertices.
+    Intuitively, since we would like $I$ and $S$ to be as similar as possible, bad vertices relative to $I$ and $S$ would be those vertices
+    $v$ such that $v \in I$ but $v \notin S$ or $v \notin I$ but $v \in S$,
+    (or more concisely, $v \in I \oplus S$).
+    \begin{definition}
+        Call a vertex $v$ bad if $v \in S$ and $|\mathbf{x}_{v}| \leq \frac{1}{2}$ or if $v
+        \not\in S$ and $|\mathbf{x}_{v}| > \frac{1}{2}$. Let $B$ be the set of bad vertices.
+    \end{definition}
+    We observe that $|B| \leq 4 \epsilon k$ since each vertex of $B$
+    contributes at least $\frac{1}{4}$ to both $\|\mathbf{x} - \mathbf{1}_{S}\|^{2}$ and
+    $\|-\mathbf{x} - \mathbf{1}_{S}\|^{2}$. We can see this by considering the boundary
+    cases for the bad vertices and their contributions to $\|\mathbf{x} -
+    \mathbf{1}_{S}\|^{2}$ and $\|-\mathbf{x} - \mathbf{1}_{S}\|^{2}$. In the first case,
+    where $v \in S$ and $|\mathbf{x}_v| \leq \frac{1}{2}$, the corresponding entry in
+    the indicator vector of the clique is $\mathbf{1}_{S}_{v} = 1$ since $v \in
+    S$. Thus, $v$ would then contribute at least $\frac{1}{4}$ to both $\|\mathbf{x} -
+    \mathbf{1}_{S}\|^{2}$ and $\|-\mathbf{x} - \mathbf{1}_{S}\|^{2}$. In the
+    other case, where $v \notin S$ and $|\mathbf{x}_{v}| > \frac{1}{2}$, the
+    corresponding entry in the indicator vector of the clique is
+    $\mathbf{1}_{S}_{v} = 0$ since $v \notin S$. Thus $v$ would also contribute
+    at least $\frac{1}{4}$ to both $\|\mathbf{x} -
+    \mathbf{1}_{S}\|^{2}$ and $\|-\mathbf{x} - \mathbf{1}_{S}\|^{2}$ in this
+    case as well. Our inequality for $|B|$ thus follows since
+    $\frac{|B|}{4} \leq \min\{\|\mathbf{x} - \mathbf{1}_{S}\|^{2}, \|-\mathbf{x} - \mathbf{1}_{S}\|^{2}\} \leq
+    \epsilon k$, so that $|B| \leq 4 \epsilon k$.
+
+    The next observation we can make is that $|I \cap S| \geq k - |B|$, or that $I$ and $S$ must have at least $k
+    - |B|$ vertices in common. We can also similarly consider 2 different cases
+    corresponding to the 2 cases for the bad vertices. Let $t = \min_{v \in I}
+    |x_{v}|$. If $t > \frac{1}{2}$, then all vertices $v$ such that $v \notin
+    S$ but $v \in I$ must have $|x_{v}| > \frac{1}{2}$ (since $t$ is the
+    minimum $|x_{v}|$ for vertices $v \in I$), and so they are bad vertices.
+    However, $I$ can contain at most $|B|$ of these bad vertices, and thus must
+    contain at least $k - |B|$ vertices from $S$ (since $|I| = |S| = k$).
+    Similar reasoning follows for the second case as well. If $t \leq
+    \frac{1}{2}$, then every vertex $v$ such that $v \in S$ but $v \notin I$
+    must have $|x_{v}| \leq \frac{1}{2}$, and so is a bad vertex. However, this
+    must mean that at least $k - |B|$ of the remaining vertices in $S$ are also
+    included in $I$. Thus, 
+
+    % insert nice diagrams showing set intersection here
+\end{proof}
+
+\end{document}
