@@ -156,6 +156,7 @@ of the algorithm, we must show that $C$ contains all the elements of $S$ ($S
 probability, so that $C = S$ with high probability. We begin by showing the first part, that $S \subseteq C$ with high probability.
 
 \subsubsection{$S \subseteq C$ with high probability}
+\label{S subseteq C}
 The first step towards showing this is that if $I$ is defined to be the set of
 $k$ vertices $v$ for which $|\mathbf{x}_{v}|$ is largest, then the sets $I$ and $S$ are almost
 the same. This results from the following lemma:
@@ -296,6 +297,21 @@ in $S$.
     % TODO more formal proof
 \end{proof}
 
-% TODO last paragraph
+With the results of Corollary \ref{chernoff neighbors}, we can now verify that
+$C \subseteq S$ with high probability, and thus that $C = S$ with high
+probability (given the results from the previous section that $S \subseteq C$
+with high probability). To do this, we first note that with probability $1 -
+e^{-\Omega{\sqrt{n}}}$ (since $k \in \Omega(\sqrt{n})$), each
+vertex $u \notin S$ has at most $.6k$ neighbors in $S$. With the results from
+\ref{S subseteq C}, we know that $I$ contains at least $.992k$ of the $k$
+vertices of $S$, and so $I$ contains at most $.008k$ other vertices not in $S$.
+Thus, in the worst case, each vertex $v \notin S$ has at most $.608k$ neighbors
+in $I$.
+Since the algorithm
+sets $C$ to be the set of vertices $v \in V$ that have at least $\frac{3}{4} k$
+neighbors in $I$, the vertices $u \notin S$ will thus not be included in $C$,
+as desired. As such, in addition to the results from \ref{S subseteq C}, we have
+with high probability that $C \subseteq S$, and thus $C =
+S$ with high probability, as we wanted.
 
 \end{document}
