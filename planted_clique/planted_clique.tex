@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{bwca-scribe}
+\usepackage{mathtools}
 \begin{document}
 % \title{Blank}
 \lecture{3}{Planted Clique in Random Graph}{Jiazheng Zhao, William Yang}{Sep 24 2018}
@@ -28,7 +29,7 @@ graph $G
 
 \subsection{Algorithm}
 Input: Graph $G$, with a planted clique of size $k$
-\begin{itemize}
+\begin{enumerate}
 %   \item 
   \item $M := A - \frac{1}{2}J$, where $A$ is the adjacency matrix of $G$, and
       $J$ is a matrix of all $1$s
@@ -37,7 +38,7 @@ Input: Graph $G$, with a planted clique of size $k$
   \item $C$: set of vertices $v \in V$ that have at least $\frac{3}{4}k$
       neighbors in $I$
   \item Return $C$
-\end{itemize}
+\end{enumerate}
 The algorithm can be divided into two parts: the first two lines obtain an
 eigenvector from the given instance; the following lines of algorithm can be
 seen as a way of rounding to extract the solution from the eigenvector. 
@@ -81,7 +82,7 @@ In order to show the eigenvector of the two matrices are similar, we first want
 to show that $A$ and $\EX(A)$ are ``close" to each other. We can use the operator norm to measure the difference between the two matrices. In this case, since both matrices are symmetric, the operator norm is just the spectral norm. In other words, we are trying to show that the largest eigenvalue of the two matrices are close. 
 
 \begin{lemma}
-Fix a set S of size k. With high probability that the following is true:
+Fix a set S of size k. With high probability the following is true:
 $$\|A-\EX(A)\| \leq (1+o(1))\cdot \sqrt{n}$$
 where $\|\cdot\|$ is the spectral norm.
 \end{lemma} 
@@ -108,9 +109,10 @@ where $\Hat{\mathbf{x}\mathbf{y}}$ is the angle between $\mathbf{x}, \mathbf{y}$
 
 
 \begin{corollary}
-If $\|A-\frac{1}{2}J - \frac{1}{2}\mathbf{1}_S\mathbf{1}_S^T\| \leq (1+o(1))\sqrt{n}, k>100\sqrt{n}$, and $\mathbf{x}$ is an eigenvector of the largest eigenvalue of $A-\frac{1}{2}J$ scaled so that $\|\mathbf{x}\|^2=k$, then
-$$\min\{\|\mathbf{x}-\mathbf{1}_S\|^2, \|-\mathbf{x}-\mathbf{1}_S\|^2\} \leq 0.002k$$
-for sufficiently large n.
+    \label{closeness}
+    If $\|A-\frac{1}{2}J - \frac{1}{2}\mathbf{1}_S\mathbf{1}_S^T\| \leq (1+o(1))\sqrt{n}, k>100\sqrt{n}$, and $\mathbf{x}$ is an eigenvector of the largest eigenvalue of $A-\frac{1}{2}J$ scaled so that $\|\mathbf{x}\|^2=k$, then
+    $$\min\{\|\mathbf{x}-\mathbf{1}_S\|^2, \|-\mathbf{x}-\mathbf{1}_S\|^2\} \leq 0.002k$$
+    for sufficiently large n.
 \end{corollary}
 
 \begin{proof}
@@ -151,13 +153,14 @@ We will now proceed to analyze the second half of the algorithm, involving $I$
 and $C$ and their relationship to $S$. In particular, to show the correctness
 of the algorithm, we must show that $C$ contains all the elements of $S$ ($S
 \subseteq C$) and none of the elements not in $S$ ($C \subseteq S$) with high
-probability. We begin by showing the first part, that $S \subseteq C$ with high probability.
+probability, so that $C = S$ with high probability. We begin by showing the first part, that $S \subseteq C$ with high probability.
 
 \subsubsection{$S \subseteq C$ with high probability}
 The first step towards showing this is that if $I$ is defined to be the set of
 $k$ vertices $v$ for which $|\mathbf{x}_{v}|$ is largest, then the sets $I$ and $S$ are almost
 the same. This results from the following lemma:
 \begin{lemma}
+    \label{intersection}
     If $\mathbf{x}$ is a vector such that $\|\mathbf{x}\|^{2} = |S| = k$ and
     $$\min\{\|\mathbf{x} - \mathbf{1}_{S}\|^{2}, \|-\mathbf{x} - \mathbf{1}_{S}\|^{2}\} \leq
     \epsilon k$$
@@ -192,7 +195,7 @@ the same. This results from the following lemma:
     \epsilon k$, so that $|B| \leq 4 \epsilon k$.
 
     The next observation we can make is that $|I \cap S| \geq k - |B|$, or that $I$ and $S$ must have at least $k
-    - |B|$ vertices in common. We can also similarly consider 2 different cases
+    - |B|$ vertices in common. To show this, we can also similarly consider 2 different cases
     corresponding to the 2 cases for the bad vertices. Let $t = \min_{v \in I}
     |x_{v}|$. If $t > \frac{1}{2}$, then all vertices $v$ such that $v \notin
     S$ but $v \in I$ must have $|x_{v}| > \frac{1}{2}$ (since $t$ is the
@@ -203,9 +206,96 @@ the same. This results from the following lemma:
     \frac{1}{2}$, then every vertex $v$ such that $v \in S$ but $v \notin I$
     must have $|x_{v}| \leq \frac{1}{2}$, and so is a bad vertex. However, this
     must mean that at least $k - |B|$ of the remaining vertices in $S$ are also
-    included in $I$. Thus, 
-
-    % insert nice diagrams showing set intersection here
+    included in $I$ (since they have $|x_v| \geq t$). Thus, $|I \cap S| \geq k
+    - |B| \geq k(1 - 4\epsilon)$.
+    % TODO insert nice diagrams showing set intersection here
 \end{proof}
+
+Using the previous results from Corollary \ref{closeness}, we can use
+$\epsilon = .002$, and with Lemma \ref{intersection}, it follows that with
+high probability, $I$
+will contain at least $k - |B| \geq k - 4 \epsilon k = .992k$ of the $k$
+vertices of $S$.
+
+This takes care of the analysis of the 3rd line of the
+algorithm regarding $I$. We can now proceed to see how this property of $I$ can be
+used to extract desired solution, $C$, recovering the planted clique. To begin,
+note that if $I$ contains at least $.992k$ of the $k$ vertices of $S$, then $C$
+will include of the vertices in $S$ since all vertices in $S$ have at least
+$.992k > \frac{3}{4}k$ neighbors in $I$. Thus, with high probability, we have
+that $S
+\subseteq C$, as we wanted to show. We now move onto showing the next part,
+that $C \subseteq S$ with high probability.
+
+\subsubsection{$C \subseteq S$ with high probability}
+To show this part, we will require the use of the Chernoff bound, in
+particular that for binomial random variables.
+
+\begin{theorem}[Chernoff bound for a Binomial Random Variable]
+    \label{Chernoff}
+    If $X_{1}, \ldots, X_{k}$ are i.i.d $\text{Bernoulli}(p)$ random variables,
+    and $X \coloneqq \sum_{i = 1}^{k} X_{i}$, so that $X \sim
+    \text{Binomial}(k, p)$, then, for every $0 < \epsilon < 1$
+
+    $$\Pr[X - \EX[X] > \epsilon k] \leq e^{-2 \epsilon^{2} k}$$
+    $$\Pr[X - \EX[X] < -\epsilon k] \leq e^{-2 \epsilon^{2} k}$$
+\end{theorem}
+% TODO proof of Chernoff Binomial bound
+
+To relate this to the situation we have at hand, note that for a vertex $v \notin S$,
+the number of neighbors of $v$ that are in $S$ is a binomial random variable $Y$ with
+$\EX[Y] = \frac{k}{2}$, and $Y = \sum_{i = 1}^{k} Y_{i}$, where each individual
+$Y_{i} \sim \text{Bernoulli}\left(\frac{1}{2}\right)$, such that each $Y_{i}$
+is an indicator random variable for the corresponding edge between a vertex $i
+\in S$ and $v$. Thus we can apply the Chernoff bound for binomial random
+variables (Theorem \ref{Chernoff}) as follows.
+% TODO insert figure showing random variables on graph (vertices & edges)
+
+\begin{corollary}
+    \label{chernoff neighbors}
+    Fix a vertex $v \notin S$. With probability at least $1 - e^{-.02k}$ over
+    the choice of $G$, vertex $v$ has at most $.6k$ neighbors in $S$.
+\end{corollary}
+
+\begin{proof}
+    We can apply Theorem \ref{Chernoff} with $\epsilon = .1$. Letting $Y \sim
+    \text{Binomial}\left(k, \frac{1}{2}\right)$ be a
+    random variable
+    denoting the number of neighbors of $v$ that are in $S$ as before, we get that
+    \begin{align*}
+        \Pr[Y \leq .6k] &= 1 - \Pr[Y > .6k]
+        \\
+        &= 1 - \Pr\left[Y - \frac{k}{2} > .1k\right]
+        \\
+        &= 1 - \Pr[Y - \EX[Y] > .1k]
+        \\
+        &\geq 1 - e^{-2(.1)^{2}k} = 1 - e^{-.02k}
+    \end{align*}
+\end{proof}
+
+We can additionally apply the union bound for an analysis of all vertices not
+in $S$.
+
+\begin{corollary}
+    With probability at least $1 - (n - k) e^{-.02k}$ over the choice of $G$,
+    every vertex $v \notin S$ has at most $.6k$ neighbors in $S$.
+\end{corollary}
+
+\begin{proof}
+    To utilize the union bound, let's consider the negation of the event that
+    we are interested in analyzing. This is the event that there is at least
+    one vertex $v \notin S$ with more than $.6k$ neighbors in $S$, which is the
+    union of $n - k$ events, where each individual event is the event that one
+    of the vertices $v \notin S$ has more than $.6k$ neighbors in $S$. This is
+    precisely $Pr[Y > .6k]$ from the previous section for the proof of
+    Corollary \ref{chernoff neighbors}, which is at most $e^{-.02k}$ by Theorem
+    \ref{Chernoff}. Thus, the probability of the negation of the desired event is at
+    most $(n - k) e^{-.02k}$, so that the probability of the actual desired
+    event is at least $1 - (n - k) e^{-.02k}$.
+
+    % TODO more formal proof
+\end{proof}
+
+% TODO last paragraph
 
 \end{document}
