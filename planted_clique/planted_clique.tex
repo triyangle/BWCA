@@ -288,13 +288,23 @@ in $S$.
     one vertex $v \notin S$ with more than $.6k$ neighbors in $S$, which is the
     union of $n - k$ events, where each individual event is the event that one
     of the vertices $v \notin S$ has more than $.6k$ neighbors in $S$. This is
-    precisely $Pr[Y > .6k]$ from the previous section for the proof of
+    precisely $\Pr[Y > .6k]$ from the previous section for the proof of
     Corollary \ref{chernoff neighbors}, which is at most $e^{-.02k}$ by Theorem
     \ref{Chernoff}. Thus, the probability of the negation of the desired event is at
-    most $(n - k) e^{-.02k}$, so that the probability of the actual desired
+    most $(n - k) e^{-.02k}$, by the union bound, so that the probability of the actual desired
     event is at least $1 - (n - k) e^{-.02k}$.
 
-    % TODO more formal proof
+    More formally, let $A$ denote the event we are interested in, that every
+    vertex $v \notin S$ has at most $.6k$ neighbors in $S$. Then, if $B_{i}$
+    denotes the event that a vertex $i$ has more than $.6k$ neighbors
+    in $S$, we have that
+    \begin{align*}
+        \Pr[A] &= 1 - \Pr\left[\bigcup_{i \notin S} B_{i}\right]
+        \\
+        &\geq 1 - \sum_{i \notin S} \Pr[B_{i}], & \text{by the union bound}
+        \\
+        &\geq 1 - (n - k) e^{-.02k}
+    \end{align*}
 \end{proof}
 
 With the results of Corollary \ref{chernoff neighbors}, we can now verify that
