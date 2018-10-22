@@ -177,6 +177,15 @@ the same. This results from the following lemma:
         Call a vertex $v$ bad if $v \in S$ and $|\mathbf{x}_{v}| \leq \frac{1}{2}$ or if $v
         \not\in S$ and $|\mathbf{x}_{v}| > \frac{1}{2}$. Let $B$ be the set of bad vertices.
     \end{definition}
+    Note that this definition matches our intuitive notion of bad vertices,
+    since vertices $v$ with higher values of $|\mathbf{x}_{v}|$ (say,
+    $|\mathbf{x}_{v}| > \frac{1}{2}$) are more likely to be contained in $I$
+    (as $I$ is the set of $k$ vertices for which $|\mathbf{x}_{v}|$ is the
+    largest)
+    and thus are bad if $v \notin S$, while vertices with lower values of
+    $|\mathbf{x}_{v}|$ (say, $|\mathbf{x}_{v}| \leq \frac{1}{2}$) are less
+    likely to be contained in $I$ and are thus bad vertices if $v \in S$.
+
     We observe that $|B| \leq 4 \epsilon k$ since each vertex of $B$
     contributes at least $\frac{1}{4}$ to both $\|\mathbf{x} - \mathbf{1}_{S}\|^{2}$ and
     $\|-\mathbf{x} - \mathbf{1}_{S}\|^{2}$. We can see this by considering the boundary
@@ -198,16 +207,16 @@ the same. This results from the following lemma:
     The next observation we can make is that $|I \cap S| \geq k - |B|$, or that $I$ and $S$ must have at least $k
     - |B|$ vertices in common. To show this, we can also similarly consider 2 different cases
     corresponding to the 2 cases for the bad vertices. Let $t = \min_{v \in I}
-    |x_{v}|$. If $t > \frac{1}{2}$, then all vertices $v$ such that $v \notin
-    S$ but $v \in I$ must have $|x_{v}| > \frac{1}{2}$ (since $t$ is the
-    minimum $|x_{v}|$ for vertices $v \in I$), and so they are bad vertices.
+    |\mathbf{x}_{v}|$. If $t > \frac{1}{2}$, then all vertices $v$ such that $v \notin
+    S$ but $v \in I$ must have $|\mathbf{x}_{v}| > \frac{1}{2}$ (since $t$ is the
+    minimum $|\mathbf{x}_{v}|$ for vertices $v \in I$), and so they are bad vertices.
     However, $I$ can contain at most $|B|$ of these bad vertices, and thus must
     contain at least $k - |B|$ vertices from $S$ (since $|I| = |S| = k$).
     Similar reasoning follows for the second case as well. If $t \leq
     \frac{1}{2}$, then every vertex $v$ such that $v \in S$ but $v \notin I$
-    must have $|x_{v}| \leq \frac{1}{2}$, and so is a bad vertex. However, this
+    must have $|\mathbf{x}_{v}| \leq \frac{1}{2}$, and so is a bad vertex. However, this
     must mean that at least $k - |B|$ of the remaining vertices in $S$ are also
-    included in $I$ (since they have $|x_v| \geq t$). Thus, $|I \cap S| \geq k
+    included in $I$ (since they have $|\mathbf{x}_v| \geq t$). Thus, $|I \cap S| \geq k
     - |B| \geq k(1 - 4\epsilon)$.
     % TODO insert nice diagrams showing set intersection here
 \end{proof}
@@ -220,9 +229,9 @@ vertices of $S$.
 
 This takes care of the analysis of the 3rd line of the
 algorithm regarding $I$. We can now proceed to see how this property of $I$ can be
-used to extract desired solution, $C$, recovering the planted clique. To begin,
+used to extract desired solution, $C$, to recover the planted clique. To begin,
 note that if $I$ contains at least $.992k$ of the $k$ vertices of $S$, then $C$
-will include of the vertices in $S$ since all vertices in $S$ have at least
+will include all of the vertices in $S$ since all vertices in $S$ will have at least
 $.992k > \frac{3}{4}k$ neighbors in $I$. Thus, with high probability, we have
 that $S
 \subseteq C$, as we wanted to show. We now move onto showing the next part,
@@ -274,7 +283,7 @@ variables (Theorem \ref{Chernoff}) as follows.
     \end{align*}
 \end{proof}
 
-We can additionally apply the union bound for an analysis of all vertices not
+We can additionally apply the union bound to extend this analysis over all vertices not
 in $S$.
 
 \begin{corollary}
@@ -301,7 +310,7 @@ in $S$.
     \begin{align*}
         \Pr[A] &= 1 - \Pr\left[\bigcup_{i \notin S} B_{i}\right]
         \\
-        &\geq 1 - \sum_{i \notin S} \Pr[B_{i}], & \text{by the union bound}
+        &\geq 1 - \sum_{i \notin S} \Pr[B_{i}] & \text{by the union bound}
         \\
         &\geq 1 - (n - k) e^{-.02k}
     \end{align*}
@@ -315,7 +324,7 @@ e^{-\Omega{\sqrt{n}}}$ (since $k \in \Omega(\sqrt{n})$), each
 vertex $u \notin S$ has at most $.6k$ neighbors in $S$. With the results from
 \ref{S subseteq C}, we know that $I$ contains at least $.992k$ of the $k$
 vertices of $S$, and so $I$ contains at most $.008k$ other vertices not in $S$.
-Thus, in the worst case, each vertex $v \notin S$ has at most $.608k$ neighbors
+Thus, in the worst case, each vertex $u \notin S$ has at most $.608k$ neighbors
 in $I$.
 Since the algorithm
 sets $C$ to be the set of vertices $v \in V$ that have at least $\frac{3}{4} k$
